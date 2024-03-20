@@ -1,6 +1,7 @@
 # Tadg O'Hare 101198108
 import psycopg2
 from dotenv import load_dotenv
+import datetime
 import os
 
 load_dotenv()
@@ -36,7 +37,7 @@ def get_all_students():
             connection.close()
     return None
 
-def add_student(first_name, last_name, email, enrollment_date):
+def add_student(first_name, last_name, email, enrollment_date=datetime.date.today()):
     """Inserts a new student record into the database"""
     connection = connect_to_db()
     if not connection:
@@ -124,8 +125,8 @@ def get_input():
             first_name = input("Enter first name: ")
             last_name = input("Enter last name: ")
             email = input("Enter email: ")
-            enrollment_date = input("Enter enrollment date: ")
-            add_student(first_name, last_name, email, enrollment_date)
+            # enrollment_date = input("Enter enrollment date: ")
+            add_student(first_name, last_name, email)
         elif command.lower() == 'get_all_students':
             students = get_all_students()
             if students:
