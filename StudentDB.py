@@ -1,7 +1,8 @@
+# Tadg O'Hare 101198108
 import psycopg2
 from dotenv import load_dotenv
 import os
-# Database connection details (replace with your own)
+
 load_dotenv()
 host = "localhost"
 database = "student_a3"
@@ -89,22 +90,36 @@ def delete_student(student_id):
             cursor.close()
             connection.close()
 
-# Example usage
-# students = get_all_students()
-# if students:
-#     print("All Students:")
-#     for student in students:
-#         print(student)  # Output student data in a suitable format
+def populate_students():
+    """Populates the students table with initial data"""
+    students = [
+        ('John', 'Doe', 'john.doe@example.com', '2023-09-01'),
+        ('Jane', 'Smith', 'jane.smith@example.com', '2023-09-01'),
+        ('Jim', 'Beam', 'jim.beam@example.com', '2023-09-02')
+    ]
+    connection = connect_to_db()
+    if not connection:
+        return None
+    cursor = connection.cursor()
+    try:
+        insert_query = "INSERT INTO students (first_name, last_name, email, enrollment_date) VALUES (%s, %s, %s, %s)"
+        cursor.executemany(insert_query, students)
+        connection.commit()  # Save changes
+        print("Students added successfully")
+    except (Exception, psycopg2.Error) as error:
+        print("Error adding students:", error)
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
 
-# add_student("Alice", "Wonderland", "alice@wonderland.com", "2023-10-01")
-# update_student_email(2, "jane.updated@example.com")
-# delete_student(3)
-
-def getInput():
+def get_input():
     while True:
-        command = input("Enter a command (or 'exit' to quit): ")
+        command = input("Enter a command (or 'exit' to quit), run 'help' for a list of commands: ")
         if command.lower() == 'exit':
             break
+        elif command.lower() == 'help':
+            get_help()
         elif command.lower() == 'add_student':
             first_name = input("Enter first name: ")
             last_name = input("Enter last name: ")
@@ -117,13 +132,31 @@ def getInput():
                 print("All Students:")
                 for student in students:
                     print(student)
+        elif command.lower() == 'populate_students':
+            populate_students()
+        elif command.lower() == 'update_student_email':
+            student_id = input("Enter student id: ")
+            new_email = input("Enter new email: ")
+            update_student_email(student_id, new_email)
+        elif command.lower() == 'delete_student':
+            student_id = input("Enter student id: ")
+            delete_student(student_id)
         else:
-            print("Unknown command")
+            print("Unknown command, run 'help' for a list of commands, or 'exit' to quit.")
 
+def get_help():
+    print("Available commands:")
+    print("  exit - Quit the program")
+    print("  add_student - Add a new student")
+    print("  get_all_students - Display all students")
+    print("  populate_students - Add initial students")
+    print("  update_student_email - Update a student's email")
+    print("  delete_student - Delete a student")
+    print("  help - Display this help message")
 
 def main():
     connect_to_db()
-    getInput()
+    get_input()
 
 
 if __name__ == "__main__":
